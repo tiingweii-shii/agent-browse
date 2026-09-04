@@ -67,6 +67,34 @@ and the hackathon URL — all should be absent/neutralized).
 - **Least-privilege manifest:** candidates to drop if unused in your flow —
   `nativeMessaging` (relay reads creds from disk now), `identity`, `downloads`,
   `tabGroups`. Test after removing each; some providers/flows rely on them.
-- **Relay bind fix (server side):** bind `127.0.0.1` + add an origin/token check
-  in `server/src/relay/server.ts` — closes the LAN credential-exposure hole. This
-  is separate from the extension and worth doing regardless.
+- **Least-privilege manifest:** see the list above (unused permissions).
+
+## Relay security (done)
+
+The relay bound to `0.0.0.0` with no auth — any LAN device could register as the
+"extension" and read Claude/Codex OAuth tokens via `read_credentials`. Fixed in
+`server/src/relay/server.ts` (+ committed `server/dist/relay/server.js`): loopback
+bind (`127.0.0.1`, override `WS_RELAY_HOST`), non-loopback peers rejected at
+connect, and a `verifyClient` origin screen (node clients + `chrome-extension://`
+allowed; http/https web origins rejected).
+
+**Deployment — the fix only helps in what RUNS.** The relay is normally launched
+by the npx MCP server (`~/.npm/_npx/.../hanzi-browse/dist/relay/server.js`), not
+the fork. Two-tier approach:
+
+1. **Stopgap** — the same patch was applied to the live npx copy. Wiped if the npx
+   cache is cleared/reinstalled.
+2. **Durable** — a LaunchAgent runs the fork's patched relay and keeps it owning
+   `127.0.0.1:7862`, so the npx relay always defers to it (EADDRINUSE → exits).
+   Install once:
+   ```
+   bash hardened/install-relay-service.sh
+   ```
+   (Installs `ws` if needed, smoke-tests, loads `com.agentbrowse.relay`.) It starts
+   at login and restarts on crash. Verify: `lsof -nP -iTCP:7862 -sTCP:LISTEN` shows
+   `127.0.0.1`, never `*`. Uninstall:
+   `launchctl unload ~/Library/LaunchAgents/com.agentbrowse.relay.plist && rm ~/Library/LaunchAgents/com.agentbrowse.relay.plist`.
+
+   Caveat: if a fresh (post-wipe) npx relay ever grabs 7862 before the agent, it'd
+   be unpatched — re-run the installer to reclaim the port. Zero-code backstop:
+   block inbound TCP 7862 at the macOS firewall.
