@@ -553,7 +553,13 @@ async function handleMcpCommand(command) {
           }
         }
         await chrome.storage.local.set(merged);
-        console.log('[MCP Bridge] Config saved');
+        // Reload the in-memory config so the pushed values take effect immediately.
+        // Without this, the running service worker keeps its old config (and the
+        // relay keepalive prevents a restart), so a config push silently no-ops
+        // until a manual extension reload — e.g. leaving apiBaseUrl on the ccproxy
+        // default and failing every LLM call with "Failed to fetch".
+        await loadConfig();
+        console.log('[MCP Bridge] Config saved and reloaded');
         // Send confirmation back through relay
         if (command.requestId) {
           sendToMcpRelay({ type: 'config_saved', requestId: command.requestId, success: true });
