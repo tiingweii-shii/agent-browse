@@ -610,42 +610,18 @@ async function handleMcpCommand(command) {
     }
 
     case 'managed_pair': {
-      // CLI setup wizard sends a pairing token to auto-pair with managed workspace.
+      // HARDENED FORK: managed pairing is disabled. The original handler POSTed a
+      // pairing token to api.hanzilla.co and routed tasks/page data through Hanzi's
+      // hosted backend. This build is BYOM-local only, so pairing is refused here
+      // and no request to any hosted service is made.
       const pairPayload = command.payload || {};
-      const { pairing_token, api_url, requestId: pairRequestId } = pairPayload;
-      if (!pairing_token) {
-        sendToMcpRelay({ type: 'mcp_managed_pair_response', requestId: pairRequestId || command.requestId, success: false, error: 'No pairing_token provided' });
-        break;
-      }
-      const baseUrl = api_url || 'https://api.hanzilla.co';
-      (async () => {
-        try {
-          const res = await fetch(`${baseUrl}/v1/browser-sessions/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pairing_token }),
-          });
-          const data = await res.json();
-          if (!data.session_token) {
-            sendToMcpRelay({ type: 'mcp_managed_pair_response', requestId: pairRequestId || command.requestId, success: false, error: data.error || 'Pairing failed' });
-            return;
-          }
-          const pairUrl = data.relay_port ? (() => {
-            const u = new URL(baseUrl);
-            u.port = String(data.relay_port);
-            return u.origin;
-          })() : baseUrl;
-          setManagedSession(data.session_token, data.browser_session_id, pairUrl);
-          sendToMcpRelay({
-            type: 'mcp_managed_pair_response',
-            requestId: pairRequestId || command.requestId,
-            success: true,
-            browser_session_id: data.browser_session_id,
-          });
-        } catch (err) {
-          sendToMcpRelay({ type: 'mcp_managed_pair_response', requestId: pairRequestId || command.requestId, success: false, error: err.message });
-        }
-      })();
+      const { requestId: pairRequestId } = pairPayload;
+      sendToMcpRelay({
+        type: 'mcp_managed_pair_response',
+        requestId: pairRequestId || command.requestId,
+        success: false,
+        error: 'Managed pairing is disabled in this hardened build (BYOM-local only).',
+      });
       break;
     }
 

@@ -6,7 +6,10 @@
  * that don't exist in Manifest V3 service workers.
  */
 
-const SENTRY_DSN = 'https://2d5504c5db572b0b2709e64f03bdfcc6@o4511120870932480.ingest.us.sentry.io/4511120907698176';
+// HARDENED FORK: Sentry DSN removed to disable all error-report egress.
+// An empty DSN makes `new URL(SENTRY_DSN)` throw below, leaving `dsn = null`,
+// so captureError() and initErrorReporting() both short-circuit — nothing is sent.
+const SENTRY_DSN = '';
 const EXTENSION_VERSION = chrome.runtime.getManifest().version;
 
 let dsn = null;

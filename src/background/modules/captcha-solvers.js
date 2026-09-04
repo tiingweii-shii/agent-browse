@@ -20,6 +20,11 @@ const SOLVERS = {
  * Returns indices AND the successful response (which may contain a token)
  */
 async function bruteForceSolver(imageUrls, encryptedAnswer, purpose) {
+  // HARDENED FORK: the original solver POSTed challenge data to a third-party
+  // hackathon backend. That egress is removed; return failure without any network
+  // call. Export/signature kept so the SW import graph still resolves.
+  return { success: false, error: 'captcha solver disabled in hardened build' };
+  // eslint-disable-next-line no-unreachable
   const BASE_URL = 'https://hackathon-backend-326152168.us-east4.run.app';
   const DELAY_MS = 100;
 
