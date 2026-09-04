@@ -13,6 +13,11 @@ set -u
 
 FORK="/Users/tingwei/Documents/GitHub/agent-browse"
 ARC_BIN="/Applications/Arc.app/Contents/MacOS/Arc"
+# --load-extension loads the fork browser-wide, so every active profile spins up
+# its own service worker and they fight over the single relay slot. Pin Arc to the
+# one "Agent Browse" profile (dir "Profile 4") so only its worker runs. Change this
+# to match your profile's DIRECTORY name (arc://version → Profile Path) if it moves.
+ARC_PROFILE_DIR="Profile 4"
 
 # Address the relay on :7862 is listening on ("127.0.0.1", "*", "[::1]", ...); empty if none.
 relay_addr() {
@@ -79,7 +84,7 @@ if pgrep -f "Arc.app/Contents/MacOS/Arc" >/dev/null 2>&1; then
 fi
 
 echo "Launching Arc with hardened 'Agent Browse (hardened)'..."
-nohup "$ARC_BIN" --load-extension="$FORK" >/dev/null 2>&1 &
+nohup "$ARC_BIN" --profile-directory="$ARC_PROFILE_DIR" --load-extension="$FORK" >/dev/null 2>&1 &
 disown
 echo "Launched."
 echo
