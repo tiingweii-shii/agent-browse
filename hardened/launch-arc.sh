@@ -13,7 +13,6 @@ set -u
 
 FORK="/Users/tingwei/Documents/GitHub/agent-browse"
 ARC_BIN="/Applications/Arc.app/Contents/MacOS/Arc"
-RELAY_PLIST="$HOME/Library/LaunchAgents/com.agentbrowse.relay.plist"
 
 # Address the relay on :7862 is listening on ("127.0.0.1", "*", "[::1]", ...); empty if none.
 relay_addr() {
@@ -42,27 +41,24 @@ fi
 echo "Checking relay bind on :7862..."
 ADDR="$(relay_addr)"
 if [ -z "$ADDR" ]; then
-  echo "  none listening — the LaunchAgent/MCP server will start one on demand. OK."
+  echo "  none listening — an MCP host will start one on demand. OK."
 elif is_loopback_addr "$ADDR"; then
   echo "  bound to $ADDR — loopback. OK."
 else
   echo "  WARNING: relay bound to '$ADDR' (network-exposed). Reclaiming for loopback..."
+  # An exposed relay means a fresh/unpatched relay won the port — e.g. a host still
+  # on `npx hanzi-browse` after a cache wipe. Kill it; the MCP host will respawn its
+  # relay, which is the FORK's (patched, loopback) once the host is repointed
+  # (see HARDENING.md → durable switch). Then re-check and fail closed if still bad.
   PID=$(lsof -nP -iTCP:7862 -sTCP:LISTEN -t 2>/dev/null | head -1)
-  [ -n "$PID" ] && kill "$PID" 2>/dev/null && echo "  stopped exposed relay (pid $PID)"
-  if [ -f "$RELAY_PLIST" ]; then
-    launchctl kickstart -k "gui/$(id -u)/com.agentbrowse.relay" 2>/dev/null \
-      || { launchctl unload "$RELAY_PLIST" 2>/dev/null; launchctl load "$RELAY_PLIST" 2>/dev/null; }
-    echo "  kicked com.agentbrowse.relay to reclaim :7862"
-  else
-    echo "  NOTE: durable relay service not installed — run hardened/install-relay-service.sh"
-  fi
-  for _ in 1 2 3 4 5; do ADDR="$(relay_addr)"; [ -n "$ADDR" ] && break; sleep 1; done
+  [ -n "$PID" ] && kill "$PID" 2>/dev/null && echo "  stopped exposed relay (pid $PID); waiting for the host to respawn a loopback relay..."
+  for _ in 1 2 3 4 5 6 7 8; do ADDR="$(relay_addr)"; [ -n "$ADDR" ] && ! is_loopback_addr "$ADDR" && { PID=$(lsof -nP -iTCP:7862 -sTCP:LISTEN -t 2>/dev/null | head -1); kill "$PID" 2>/dev/null; }; is_loopback_addr "$ADDR" && break; sleep 1; done
   if is_loopback_addr "$ADDR"; then
     echo "  reclaimed — relay now bound to $ADDR."
   else
-    echo "  WARNING: relay is '${ADDR:-none}', not loopback. An MCP host may be respawning"
-    echo "           an unpatched relay — restart the durable service, or apply the stopgap"
-    echo "           patch to the npx copy (see HARDENING.md). NOT launching Arc."
+    echo "  WARNING: relay is '${ADDR:-none}', not loopback. A host is still respawning an"
+    echo "           UNPATCHED relay — repoint it to the fork (HARDENING.md → durable switch)"
+    echo "           or re-apply the stopgap. NOT launching Arc."
     exit 1
   fi
 fi
