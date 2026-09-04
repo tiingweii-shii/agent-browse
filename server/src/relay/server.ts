@@ -128,8 +128,34 @@ function flushExtensionQueue(ext: RelayClient): void {
   log(`Flushed queue: ${delivered} delivered, ${expired} expired`);
 }
 
-const wss = new WebSocketServer({ port }, () => {
-  log(`Listening on ws://localhost:${port}`);
+// SECURITY (hardened fork): bind to loopback only and screen connections.
+// Upstream passed no `host`, so the relay bound to 0.0.0.0/:: — any device on the
+// LAN could connect, register as the "extension", and read the user's Claude/Codex
+// OAuth tokens via `read_credentials` (or spend the account via `proxy_api_call`).
+// We bind to 127.0.0.1, reject non-loopback peers, and reject cross-origin browser
+// connections (a malicious page reaching ws://localhost).
+const host = process.env.WS_RELAY_HOST || '127.0.0.1';
+
+function isLoopback(addr: string | undefined): boolean {
+  return addr === '127.0.0.1' || addr === '::1' || addr === '::ffff:127.0.0.1';
+}
+
+const wss = new WebSocketServer({
+  port,
+  host,
+  verifyClient: ({ origin, req }: { origin?: string; req: any }) => {
+    // Node clients (MCP server, CLI) send no Origin header — allow. The extension
+    // service worker connects with a chrome-extension:// origin. Reject anything
+    // else (http/https web pages reaching ws://localhost).
+    const o = origin || req?.headers?.origin;
+    if (o && !o.startsWith('chrome-extension://')) {
+      log(`Rejected WebSocket handshake from origin: ${o}`);
+      return false;
+    }
+    return true;
+  },
+}, () => {
+  log(`Listening on ws://${host}:${port}`);
 });
 
 wss.on('error', (err: NodeJS.ErrnoException) => {
@@ -141,7 +167,13 @@ wss.on('error', (err: NodeJS.ErrnoException) => {
   process.exit(1);
 });
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+  const remote = req?.socket?.remoteAddress;
+  if (!isLoopback(remote)) {
+    log(`Rejected non-loopback connection from ${remote}`);
+    ws.close(1008, 'loopback only');
+    return;
+  }
   log(`New connection (${clients.size + 1} total)`);
 
   ws.on('message', (data) => {

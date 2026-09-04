@@ -98,8 +98,25 @@ function flushExtensionQueue(ext) {
     }
     log(`Flushed queue: ${delivered} delivered, ${expired} expired`);
 }
-const wss = new WebSocketServer({ port }, () => {
-    log(`Listening on ws://localhost:${port}`);
+// SECURITY (hardened fork): loopback-only bind + connection screening. See
+// server/src/relay/server.ts for rationale (LAN credential-exposure fix).
+const host = process.env.WS_RELAY_HOST || '127.0.0.1';
+function isLoopback(addr) {
+    return addr === '127.0.0.1' || addr === '::1' || addr === '::ffff:127.0.0.1';
+}
+const wss = new WebSocketServer({
+    port,
+    host,
+    verifyClient: ({ origin, req }) => {
+        const o = origin || (req && req.headers && req.headers.origin);
+        if (o && !o.startsWith('chrome-extension://')) {
+            log(`Rejected WebSocket handshake from origin: ${o}`);
+            return false;
+        }
+        return true;
+    },
+}, () => {
+    log(`Listening on ws://${host}:${port}`);
 });
 wss.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
@@ -109,7 +126,13 @@ wss.on('error', (err) => {
     log(`Server error: ${err.message}`);
     process.exit(1);
 });
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+    const remote = req && req.socket && req.socket.remoteAddress;
+    if (!isLoopback(remote)) {
+        log(`Rejected non-loopback connection from ${remote}`);
+        ws.close(1008, 'loopback only');
+        return;
+    }
     log(`New connection (${clients.size + 1} total)`);
     ws.on('message', (data) => {
         let msg;
