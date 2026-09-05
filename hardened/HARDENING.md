@@ -27,31 +27,21 @@ OK — 44 modules resolve
 - The `ccproxy` path and the legacy embed pairing default to `localhost` — no
   external egress unless you explicitly point them off-box.
 
-## Switchover — one time
+## Switchover — run the extension in a dedicated profile
 
-1. **Disable the Web Store copy.** `arc://extensions` → turn OFF (or Remove)
-   "Hanzi Browse". The relay accepts only ONE extension; two copies flap.
-2. **Launch Arc with the hardened build:**
-   ```
-   bash /Users/tingwei/Documents/GitHub/agent-browse/hardened/launch-arc.sh
-   ```
-   (Quits Arc, verifies the SW graph, relaunches with `--load-extension`.)
-3. **Approve it.** Arc may show a "developer mode extension" notice — keep it
-   enabled. Confirm "Agent Browse (hardened)" appears and is ON.
-4. **Wake + configure.** Open the side panel once (wakes the service worker so it
-   connects to the relay), then:
-   ```
-   node /Users/tingwei/Documents/GitHub/agent-browse/hardened/configure-extension.mjs
-   ```
-   Expect `extensionConnected = true` → `config_saved: {"success":true}`.
-5. **Verify.** Run a trivial task; confirm the relay shows the extension connected
-   and an LLM call succeeds.
+**See `hardened/AGENT-PROFILE.md` for the full steps.** In short: the relay accepts
+only ONE extension, so the fork must run in exactly one browser profile. Use a
+dedicated **Chrome profile** and `chrome://extensions` → Developer mode → **Load
+unpacked** → this repo root. Chrome's Load-unpacked is per-profile, so only that
+profile runs a worker; it persists across restarts and runs alongside your Arc.
+Then open the side panel once and `node hardened/configure-extension.mjs`, log into
+the sites you need, and remove any other copy of the extension (Web Store build,
+Arc `--load-extension`) so nothing competes for the relay slot.
 
-## Every time after
-
-- Reopen Arc via `hardened/launch-arc.sh` — **not** the dock icon. `--load-extension`
-  is per-launch; a normal start drops it (and re-enables nothing external).
-- If Arc self-relaunches after an update, run the script again.
+> **Retired: `hardened/launch-arc.sh` and Arc `--load-extension`.** Arc loads the
+> extension browser-wide, so multiple profiles' workers register as `extension` and
+> evict each other every ~5s (`WS_RECONNECT_DELAY_MS`) — an endless flap.
+> `--profile-directory` does not fix it. Use the dedicated-profile method above.
 
 ## Staying current with upstream (optional)
 
@@ -107,10 +97,9 @@ MCP server. The relay binary they run is the npx build
    Once every host is repointed AND verified, the npx copy is unused and can be
    deleted (`rm -rf ~/.npm/_npx/<hash>` — guard on `node_modules/hanzi-browse`).
 
-`launch-arc.sh` also asserts the relay is loopback on every Arc start and
-reclaims/fails-closed if not — a backstop against an unpatched relay slipping in.
-Zero-code backstop for the exposure itself: block inbound TCP 7862 at the macOS
-firewall.
+To spot-check the relay is loopback at any time: `lsof -nP -iTCP:7862 -sTCP:LISTEN`
+should show `127.0.0.1`, never `*`. Zero-code backstop for the exposure itself:
+block inbound TCP 7862 at the macOS firewall.
 
 > A LaunchAgent that ran the fork relay standalone was tried and abandoned: macOS
 > TCC blocks a launchd agent from executing a script under `~/Documents`, and a
