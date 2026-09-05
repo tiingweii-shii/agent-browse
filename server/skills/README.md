@@ -1,12 +1,12 @@
-# Hanzi Browse Skills
+# Agent Browse Skills
 
-Agent skills for [Hanzi Browse](https://browse.hanzilla.co) — give your AI agent a real browser.
+Agent skills for **Agent Browse** (a private, hardened fork of hanzi-browse) — give your AI agent a real browser.
 
 ## Core Skill
 
 | Skill | Description |
 |-------|-------------|
-| [hanzi-browse](hanzi-browse/) | Browser automation via MCP — click, type, fill forms, read authenticated pages |
+| [agent-browse](agent-browse/) | Browser automation via MCP — click, type, fill forms, read authenticated pages |
 
 ## Workflow Skills
 
@@ -23,26 +23,26 @@ Agent skills for [Hanzi Browse](https://browse.hanzilla.co) — give your AI age
 ### Claude Code
 ```bash
 # Copy a skill to your project
-cp -r hanzi-browse/ .claude/skills/hanzi-browse/
+cp -r agent-browse/ .claude/skills/agent-browse/
 
 # Or install globally
-cp -r hanzi-browse/ ~/.claude/skills/hanzi-browse/
+cp -r agent-browse/ ~/.claude/skills/agent-browse/
 ```
 
 ### Cursor
 ```bash
-cp -r hanzi-browse/ .cursor/skills/hanzi-browse/
+cp -r agent-browse/ .cursor/skills/agent-browse/
 ```
 
 ### Other agents
-Copy the skill directory to your agent's skills folder. See [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) for paths.
+Copy the skill directory to your agent's skills folder.
 
 ## Setup
 
-The skills require the Hanzi Browse MCP server:
+This fork is **not** installed via `npx hanzi-browse setup`. It runs in a dedicated
+Chrome profile with the extension loaded unpacked, and the MCP server auto-starts
+the (loopback-bound) relay. Full setup and troubleshooting:
 
-```bash
-npx hanzi-browse setup
-```
-
-This installs the Chrome extension and configures your AI agents automatically.
+- `hardened/AGENT-PROFILE.md` — dedicated-profile setup
+- `hardened/MANUAL.md` — daily use, golden rules, known issues & fixes
+- `hardened/HARDENING.md` — what was changed and why (security)
