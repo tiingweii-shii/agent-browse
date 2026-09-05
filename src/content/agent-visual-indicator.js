@@ -220,7 +220,7 @@
         <rect width="24" height="24" rx="6" fill="#1a1a1a"/>
         <path d="M7 7v10M17 7v10M7 12h10" stroke="#fafaf8" stroke-width="2.5" stroke-linecap="round"/>
       </svg>
-      <span style="vertical-align:middle;margin-left:6px">Powered by <a href="https://browse.hanzilla.co" target="_blank" style="color:#ad5a34;text-decoration:none;font-weight:600">Hanzi Browse</a></span>
+      <span style="vertical-align:middle;margin-left:6px;font-weight:600">Agent Browse</span>
       ${shortId ? `<span style="vertical-align:middle;margin-left:8px;opacity:0.5;cursor:pointer;font-family:monospace;font-size:11px" title="Click to copy task ID" id="hanzi-task-id">${shortId}</span>` : ''}
     `;
 
