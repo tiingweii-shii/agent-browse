@@ -118,10 +118,18 @@ Everything below was hit and solved during setup. If something breaks, find the 
 
 | Want to check… | Command |
 |---|---|
-| Extension graph is intact after an edit | `node hardened/check-sw-graph.mjs` → `OK — 44 modules resolve` |
+| Extension graph is intact after an edit | `node hardened/check-sw-graph.mjs` → `OK — 45 modules resolve` |
 | Relay is up and loopback-bound | `lsof -nP -iTCP:7862 -sTCP:LISTEN` → shows `127.0.0.1` |
 | Relay is the fork (not npx) | `ps -o command= -p $(lsof -nP -iTCP:7862 -sTCP:LISTEN -t\|head -1)` → path contains `agent-browse` |
 | Re-push config to the extension | open side panel, then `node hardened/configure-extension.mjs` |
+| Clear old task-log folders now | `hardened/prune-task-logs.sh 14` (or `--dry-run` first) |
+
+**Task logs.** Every task run drops a folder in `~/Downloads/browser-agent/`
+(`log.json` + screenshots — a full record of what the agent saw and did). The
+extension auto-deletes folders older than `taskLogRetentionDays` (default **14**,
+set by `configure-extension.mjs`; `0` = keep forever). It can't remove the empty
+folders left behind — run `hardened/prune-task-logs.sh` occasionally, or add it to
+`cron`/`launchd`, to tidy those. See `HARDENING.md` → *Task-log retention*.
 
 **Pull upstream fixes (if it ever revives):**
 ```
@@ -159,3 +167,5 @@ Full detail in `HARDENING.md`. In brief, versus upstream:
 | `hardened/AGENT-PROFILE.md` | dedicated-profile setup steps |
 | `hardened/configure-extension.mjs` | push BYOM config + telemetry-off to the extension |
 | `hardened/check-sw-graph.mjs` | verify the service-worker import graph resolves |
+| `hardened/prune-task-logs.sh` | filesystem backstop for the task-log retention sweep |
+| `src/background/managers/log-retention.js` | the task-log retention sweep itself |

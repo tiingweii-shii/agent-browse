@@ -45,8 +45,10 @@ import {
   setManagedSession, clearManagedSession, getManagedSessionInfo, sendToMcpRelay, stopManagedTask,
 } from './modules/mcp-bridge.js';
 import { checkAndIncrementUsage, activateLicense, getLicenseStatus, deactivateLicense } from './managers/license-manager.js';
+import { initTaskLogRetention, maybeSweepOldTaskLogs } from './managers/log-retention.js';
 import { initErrorReporting, captureError } from './modules/error-reporter.js';
 initErrorReporting();
+initTaskLogRetention();
 
 // ============================================
 // CONSTANTS
@@ -1044,6 +1046,7 @@ async function startTask(tabId, task, shouldAskBeforeActing = true, images = [],
       error: null,
     };
     await saveTaskLogs(logData, uiSessionState.taskScreenshots);
+    void maybeSweepOldTaskLogs('post-task');
 
     // Hide visual indicators
     await hideAgentIndicators(tabId);
@@ -1084,6 +1087,7 @@ async function startTask(tabId, task, shouldAskBeforeActing = true, images = [],
       error: isCancelled ? 'Stopped by user' : error.message,
     };
     await saveTaskLogs(logData, uiSessionState.taskScreenshots);
+    void maybeSweepOldTaskLogs('post-task');
 
     // Record failed task completion for usage stats
     recordTaskCompletion(false);
@@ -1624,6 +1628,7 @@ async function startMcpTaskInternal(sessionId, tabId, task) {
       error: null,
     };
     await saveTaskLogs(logData, session.screenshots, { sessionId });
+    void maybeSweepOldTaskLogs('post-task');
 
     // Record task completion for usage stats
     recordTaskCompletion(result.success);
@@ -1681,6 +1686,7 @@ async function startMcpTaskInternal(sessionId, tabId, task) {
       error: errorMessage,
     };
     await saveTaskLogs(logData, session.screenshots, { sessionId });
+    void maybeSweepOldTaskLogs('post-task');
 
     // Record failed task for usage stats
     recordTaskCompletion(false);

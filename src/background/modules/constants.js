@@ -25,6 +25,15 @@ export const LIMITS = {
   NETWORK_REQUESTS: 1000,
 };
 
+// Task-log retention (Store 3: saveTaskLogs → Downloads/browser-agent/<folder>/)
+export const TASK_LOG_RETENTION = {
+  DEFAULT_DAYS: 14,     // used when `taskLogRetentionDays` is unset or invalid
+  MIN_DAYS: 1,          // floor for a positive setting; 0 means "keep forever"
+  SWEEP_PERIOD_MINUTES: 24 * 60,   // chrome.alarms cadence
+  STARTUP_DELAY_MINUTES: 1,        // first sweep after a service-worker start
+  MIN_SWEEP_INTERVAL_MS: 6 * 60 * 60 * 1000, // throttle for opportunistic calls
+};
+
 export const VIEWPORT = {
   DEFAULT_WIDTH: 1920,
   DEFAULT_HEIGHT: 1080,

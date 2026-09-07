@@ -19,6 +19,7 @@ const CONFIG = {
   maxSteps: 30,
   maxTokens: 8000,
   telemetry_enabled: false, // hardened build has no DSN anyway; belt-and-suspenders
+  taskLogRetentionDays: 14, // auto-delete Downloads/browser-agent/* logs older than this; 0 = keep forever
 };
 
 // Prefer Node's built-in WebSocket (Node 22+); fall back to the npx-cached ws module.

@@ -12,13 +12,14 @@ you configured, and no code changes under you without your review.
 | 2 | `src/background/modules/captcha-solvers.js` | `bruteForceSolver` returns failure before any network call | Removes egress of challenge data to a third-party hackathon Cloud Run backend. Export kept so the SW import graph still resolves. |
 | 3 | `src/background/modules/mcp-bridge.js` | `managed_pair` case refuses without fetching | Removes pairing/task routing through Hanzi's hosted service (`api.hanzilla.co`). This build is BYOM-local only. |
 | 4 | `manifest.json` | name → `Agent Browse (hardened)` | So you can tell this build apart from the Web Store copy in the extensions list. (chrome.storage is keyed by ID/path, not name — safe.) |
+| 5 | `src/background/managers/log-retention.js` (new) + `service-worker.js` wiring + `modules/constants.js` | Auto-deletes task-log folders (Store 3) older than `taskLogRetentionDays` | Upstream writes one folder per task run to `~/Downloads/browser-agent/` via `chrome.downloads` and never deletes them — an unbounded on-disk record of every page the agent touched. See [Task-log retention](#task-log-retention-store-3). |
 
 The missing-file bug (`src/tools/definitions.js`) that breaks the Web Store 2.3.3
 build does **not** affect this fork — the file is present. Verified:
 
 ```
 $ node hardened/check-sw-graph.mjs
-OK — 44 modules resolve
+OK — 45 modules resolve
 ```
 
 ### Egress paths intentionally left as-is (not leaks)
@@ -43,6 +44,42 @@ Arc `--load-extension`) so nothing competes for the relay slot.
 > evict each other every ~5s (`WS_RECONNECT_DELAY_MS`) — an endless flap.
 > `--profile-directory` does not fix it. Use the dedicated-profile method above.
 
+## Task-log retention (Store 3)
+
+`saveTaskLogs()` writes one folder per task run to the browser's Downloads dir:
+
+```
+~/Downloads/browser-agent/<timestamp>-<sessionId>/log.json          # full turn-by-turn history, AI text, tool results, token usage
+~/Downloads/browser-agent/<timestamp>-<sessionId>/screenshot_N.png
+```
+
+Upstream never deletes these. This build sweeps them:
+
+- **`src/background/managers/log-retention.js`** — a `chrome.alarms` job (daily, plus
+  once ~1 min after each service-worker start, plus opportunistically after each
+  task) that calls `chrome.downloads.removeFile` + `erase` on every task-log file
+  whose `startTime` is older than the retention window. Strict filename regex
+  (`browser-agent/<folder>/log.json` or `screenshot_N.png`) so it can't touch an
+  unrelated download. Opportunistic runs are throttled to once per 6 h.
+- **Setting:** `taskLogRetentionDays` in `chrome.storage.local`
+  (pushed by `hardened/configure-extension.mjs`, default **14**). `0` = keep
+  forever (sweep disabled). Unset/invalid → 14.
+- **`chrome.downloads.removeFile` deletes permanently** — files do **not** go to
+  the Trash.
+
+**Limitation:** `chrome.downloads` can delete files, not directories, and can only
+see files it still has a history record for. So empty `browser-agent/<folder>/`
+dirs are left behind, and if you clear Chrome's download history the extension
+can no longer find older files. **`hardened/prune-task-logs.sh`** is the
+filesystem-side backstop — it removes whole folders older than N days (by mtime)
+and clears leftover empty dirs. Run it by hand, or from `cron`/`launchd`:
+
+```
+hardened/prune-task-logs.sh 14              # delete folders older than 14 days
+hardened/prune-task-logs.sh 14 --dry-run    # preview
+RETENTION_DAYS=30 hardened/prune-task-logs.sh
+```
+
 ## Staying current with upstream (optional)
 
 Upstream is dormant, but if it revives:
@@ -55,8 +92,9 @@ and the hackathon URL — all should be absent/neutralized).
 
 ## Optional next hardening (not done — behavior risk)
 - **Least-privilege manifest:** candidates to drop if unused in your flow —
-  `nativeMessaging` (relay reads creds from disk now), `identity`, `downloads`,
-  `tabGroups`. Test after removing each; some providers/flows rely on them.
+  `nativeMessaging` (relay reads creds from disk now), `identity`, `tabGroups`.
+  Test after removing each; some providers/flows rely on them. (`downloads` and
+  `alarms` are now used by the task-log retention sweep — keep them.)
 
 ## Relay security (done)
 
