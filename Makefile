@@ -80,8 +80,7 @@ build: ## Build server + dashboard + extension
 	@cd server && npm run build 2>&1 | tail -1
 	@echo "  ✓ Build complete"
 
-symlinks: ## Create symlinks for local serving (landing, sdk)
-	@ln -sf ../landing server/landing 2>/dev/null || true
+symlinks: ## Create symlinks for local serving (sdk)
 	@ln -sf ../sdk server/sdk 2>/dev/null || true
 
 db: ## Start Postgres (Docker)

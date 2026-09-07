@@ -52,8 +52,7 @@ Partner app → REST API (api.hanzilla.co) → Agent loop on server → Extensio
 | `server/skills/` | Agent skills (markdown) | Each skill is a `SKILL.md` with instructions |
 | `server/src/agent/domain-skills.json` | Domain interaction patterns | Single source of truth for per-domain tips (x.com, linkedin, zillow, amazon…) |
 | `sdk/src/` | TypeScript client | `index.ts` — HanziClient class |
-| `landing/` | Marketing site (static HTML) | `index.html`, `docs.html`, `embed.js` |
-| `examples/` | Demo apps | `x-marketing/` (free tool), `partner-quickstart/` (API demo) |
+| `examples/` | Demo apps | `partner-quickstart/` (API demo) |
 | `native-host/` | OAuth bridge for extension | `native-bridge.cjs` |
 | `server/dashboard/` | Web UI (Preact) | `src/App.jsx` |
 

@@ -37,7 +37,6 @@ Load the extension: open `chrome://extensions`, enable Developer Mode, click "Lo
 ## Architecture
 
 ```
-Website (landing/)         → static HTML, no build step
 Extension (src/)           → Preact, built with Vite (dist/)
 MCP Server (server/src/)   → TypeScript, built with tsc (server/dist/)
 Dashboard (server/dashboard/) → Preact + Vite (server/dist/dashboard/)
@@ -59,8 +58,6 @@ Key internal docs:
 
 - **New skills** — just a `SKILL.md` file. See `server/skills/linkedin-prospector/SKILL.md` for the pattern.
 - **Domain knowledge** — add interaction tips for a website the agent supports. See the section below.
-- **Landing page** — pure HTML in `landing/`. No build step.
-- **Docs** — `landing/docs.html` is the public docs page.
 - **CLI improvements** — `server/src/cli/setup.ts` and `server/src/cli.ts`.
 - **Tool handlers** — each handler in `src/background/tool-handlers/` is isolated.
 - **Platform support** — we're primarily macOS. Windows and Linux contributions welcome.

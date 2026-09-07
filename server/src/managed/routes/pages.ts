@@ -1,7 +1,7 @@
 /**
  * Page & static file routes.
  *
- * Handles: dashboard SPA, docs, embed.js, pairing pages, root redirect.
+ * Handles: dashboard SPA, pairing pages, root redirect.
  * Returns true if the request was handled, false to continue to API routes.
  */
 
@@ -86,33 +86,6 @@ export async function handlePageRoutes(
       res.writeHead(302, { Location: "https://browse.hanzilla.co" });
     }
     res.end();
-    return true;
-  }
-
-  // --- Docs ---
-  if (url === "/docs.html" || url?.startsWith("/docs.html")) {
-    const filePath = join(process.cwd(), "landing", "docs.html");
-    if (existsSync(filePath)) {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(readFileSync(filePath));
-      return true;
-    }
-  }
-
-  // --- Embeddable pairing component ---
-  if (url === "/embed.js") {
-    const embedPath = join(process.cwd(), "landing/embed.js");
-    if (existsSync(embedPath)) {
-      res.writeHead(200, {
-        "Content-Type": "application/javascript",
-        "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=3600",
-      });
-      res.end(readFileSync(embedPath));
-    } else {
-      res.writeHead(404);
-      res.end("Not found");
-    }
     return true;
   }
 
