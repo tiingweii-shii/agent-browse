@@ -94,10 +94,10 @@ export function SettingsModal({ config, onClose }) {
             <div class="provider-section">
               <div class="connected-status">
                 <span class="status-badge connected">Connected</span>
-                <span style={{ fontSize: '14px', marginLeft: '8px' }}>Hanzi Managed</span>
+                <span style={{ fontSize: '14px', marginLeft: '8px' }}>Managed</span>
               </div>
               <p class="provider-desc" style={{ marginTop: '12px' }}>
-                Your browser is connected to Hanzi's managed AI service. Tasks you run in the sidepanel use your managed account.
+                Your browser is connected to the managed AI service. Tasks you run in the sidepanel use your managed account.
               </p>
               <button class="btn btn-secondary btn-sm" onClick={handleDisconnect} style={{ marginTop: '8px' }}>
                 Disconnect
@@ -189,7 +189,7 @@ function ConnectionsTab({
     <div class="tab-content">
       {/* Managed service */}
       <div class="provider-section">
-        <h4>Hanzi Managed</h4>
+        <h4>Managed</h4>
         <p class="provider-desc">We handle the AI. 20 free tasks/month, then $0.05/task. No API key needed.</p>
         <a class="btn btn-primary" href="https://api.hanzilla.co/pair-self" target="_blank" rel="noreferrer"
           style={{ textDecoration: 'none' }}>
@@ -312,7 +312,7 @@ function ConnectionsTab({
 function SkillsTab({ userSkills, builtInSkills, skillForm, setSkillForm, onAdd, onEdit, onRemove, formError }) {
   return (
     <div class="tab-content">
-      <p class="tab-desc">Teach Hanzi how to navigate specific websites better</p>
+      <p class="tab-desc">Teach the agent how to navigate specific websites better</p>
 
       <button
         class="btn btn-secondary"
@@ -438,7 +438,7 @@ function ManagedTab() {
       <div class="provider-section">
         <h4>Pair this browser</h4>
         <p class="provider-desc">
-          Paste a pairing token to connect this browser to a Hanzi workspace. Once paired, your workspace can run tasks in this browser remotely.
+          Paste a pairing token to connect this browser to a workspace. Once paired, your workspace can run tasks in this browser remotely.
         </p>
       </div>
 
@@ -490,7 +490,7 @@ function ManagedTab() {
                   placeholder={DEFAULT_API_URL}
                 />
                 <p class="provider-desc" style={{ fontSize: '0.75em', marginTop: '4px' }}>
-                  Only change this if you are running a local or custom Hanzi deployment.
+                  Only change this if you are running a local or custom deployment.
                 </p>
               </div>
             )}
@@ -506,7 +506,7 @@ function ManagedTab() {
 
       <div class="provider-section">
         <p class="provider-desc" style={{ opacity: 0.6, fontSize: '0.8em' }}>
-          Get a pairing token from the app that is integrating Hanzi, or create one with <code>POST /v1/browser-sessions/pair</code>.
+          Get a pairing token from the app that is integrating Agent Browse, or create one with <code>POST /v1/browser-sessions/pair</code>.
         </p>
       </div>
     </div>

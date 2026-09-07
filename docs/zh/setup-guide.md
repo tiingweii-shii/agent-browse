@@ -1,4 +1,4 @@
-# Hanzi Browse 中文安装指南
+# Agent Browse 中文安装指南
 
 这份文档不是逐句翻译 README，而是按国内开发者常见的使用场景来写：
 
@@ -98,7 +98,7 @@ npm config set registry https://registry.npmjs.org
 - Vertex AI
 - 你自己选的 AI provider（比如 OpenAI、Anthropic 等）
 
-这不代表 Hanzi Browse 不能用，而是说明你要分清自己现在在测哪一层：
+这不代表 Agent Browse 不能用，而是说明你要分清自己现在在测哪一层：
 
 - **只测扩展 UI / 本地构建**：可以先不碰这些服务
 - **只测手动加载扩展**：不需要 Chrome Web Store
@@ -141,7 +141,7 @@ npm run build
 2. 选择 “Load unpacked”
 3. 选择仓库根目录下的 `dist/`
 
-到这里，你已经能在浏览器里看到 Hanzi Browse 扩展了。
+到这里，你已经能在浏览器里看到 Agent Browse 扩展了。
 
 ## 路线 B：跑完整本地开发环境
 

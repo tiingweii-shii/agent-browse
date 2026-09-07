@@ -14,7 +14,7 @@ function generateExtensionHtml() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hanzi Browse</title>
+  <title>Agent Browse</title>
   <link rel="stylesheet" href="./sidepanel.css">
 </head>
 <body>
@@ -31,7 +31,7 @@ function generateExtensionHtml() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Hanzi Browse</title>
+  <title>Welcome to Agent Browse</title>
   <link rel="stylesheet" href="./onboarding.css">
 </head>
 <body>

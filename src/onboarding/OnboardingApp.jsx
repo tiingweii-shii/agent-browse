@@ -178,14 +178,19 @@ export function OnboardingApp() {
           <div class="logo-icon">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="24" height="24" rx="6" fill="currentColor" />
-              <path d="M7 7v10M17 7v10M7 12h10" stroke="var(--bg-primary)" stroke-width="2.5" stroke-linecap="round"/>
+              <g stroke="var(--bg-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="10.5" cy="10.5" r="5.5" />
+                <path d="M5 10.5h11M10.5 5c2 2 2 9 0 11M10.5 5c-2 2-2 9 0 11" />
+                <circle cx="13" cy="13" r="4" fill="currentColor" />
+                <path d="M16 16l3 3" />
+              </g>
             </svg>
           </div>
-          <h1>{isReady ? 'Hanzi is ready' : 'Set up Hanzi'}</h1>
+          <h1>{isReady ? 'Agent Browse is ready' : 'Set up Agent Browse'}</h1>
           <p class="subtitle">
             {isReady
-              ? 'Your browser is connected and credentials are configured. You can use Hanzi from the sidepanel or from your AI agent.'
-              : 'Hanzi needs credentials to run browser tasks. The fastest way to get started:'
+              ? 'Your browser is connected and credentials are configured. You can use Agent Browse from the sidepanel or from your AI agent.'
+              : 'Agent Browse needs credentials to run browser tasks. The fastest way to get started:'
             }
           </p>
         </div>
@@ -241,7 +246,7 @@ export function OnboardingApp() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
-                Ready to go. Click the Hanzi icon in Chrome to open the sidepanel, or use Hanzi from your AI agent.
+                Ready to go. Click the Agent Browse icon in Chrome to open the sidepanel, or use it from your AI agent.
               </div>
               <div style={{ textAlign: 'center' }}>
                 <button class="btn btn-primary btn-lg" onClick={markComplete}>
@@ -261,7 +266,7 @@ export function OnboardingApp() {
                 </div>
                 <div class="done-section">
                   <h3>Use from the Chrome sidepanel</h3>
-                  <p class="section-intro">Click the Hanzi icon in your Chrome toolbar to open the sidepanel. Describe a task and Hanzi will browse for you.</p>
+                  <p class="section-intro">Click the Agent Browse icon in your Chrome toolbar to open the sidepanel. Describe a task and it will browse for you.</p>
                 </div>
               </div>
             </div>

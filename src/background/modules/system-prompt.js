@@ -91,7 +91,7 @@ When you receive a task, look for context in <system-reminder> tags. These conta
 Example:
 <system-reminder>
 Task context (use this for filling forms):
-Product: Hanzi Browse
+Product: Agent Browse
 Price: Free
 URL: github.com/hanzili/hanzi-browse
 </system-reminder>

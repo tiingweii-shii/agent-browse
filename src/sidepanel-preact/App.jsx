@@ -64,7 +64,12 @@ export function App() {
           <div class="empty-icon">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="24" height="24" rx="6" fill="currentColor" />
-              <path d="M7 7v10M17 7v10M7 12h10" stroke="var(--bg-primary)" stroke-width="2.5" stroke-linecap="round"/>
+              <g stroke="var(--bg-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="10.5" cy="10.5" r="5.5" />
+                <path d="M5 10.5h11M10.5 5c2 2 2 9 0 11M10.5 5c-2 2-2 9 0 11" />
+                <circle cx="13" cy="13" r="4" fill="currentColor" />
+                <path d="M16 16l3 3" />
+              </g>
             </svg>
           </div>
           <h2>Almost ready</h2>
@@ -94,7 +99,7 @@ export function App() {
   return (
     <div class="app">
       <Header
-        currentModel={isManaged ? { name: 'Hanzi Managed' } : config.currentModel}
+        currentModel={isManaged ? { name: 'Managed' } : config.currentModel}
         availableModels={isManaged ? [] : config.availableModels}
         currentModelIndex={config.currentModelIndex}
         onModelSelect={config.selectModel}
