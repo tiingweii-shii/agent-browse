@@ -1,4 +1,4 @@
-# Contributing to Hanzi
+# Contributing to Agent Browse
 
 Thanks for wanting to contribute! Here's what you need to know.
 
@@ -44,13 +44,8 @@ SDK (sdk/)                 → TypeScript (sdk/dist/)
 ```
 
 Two product paths:
-- **Use Hanzi now** — CLI-first. `npx hanzi-browse setup` configures local BYOM usage.
-- **Build with Hanzi** — API/dashboard-first. Sign in → developer console → create key → pair browser → run tasks.
-
-Key internal docs:
-- `docs/internal/PRODUCT_MODEL.md` — product paths, access modes, surface roles
-- `docs/internal/PRODUCTION_READINESS.md` — current state, what's ready, what's not
-- `docs/internal/PRODUCTION_LAUNCH_SPEC.md` — what must be built for production
+- **Use Agent Browse now** — CLI-first. `npx hanzi-browse setup` configures local BYOM usage.
+- **Build with Agent Browse** — API/dashboard-first. Sign in → developer console → create key → pair browser → run tasks.
 
 ## What to work on
 
@@ -146,11 +141,11 @@ Optional:
 
 ## PR checklist
 
-- [ ] Limited to one area (skill, test, CLI, tool handler, docs, or landing page)
+- [ ] Limited to one area (skill, test, CLI, tool handler, or docs)
 - [ ] Tested locally (`make build` passes)
 - [ ] No changes to security-sensitive modules without prior discussion
 - [ ] Follows existing code style
 
 ## Questions?
 
-[Discord](https://discord.gg/hahgu5hcA5) · [GitHub Issues](https://github.com/hanzili/hanzi-browse/issues) · hanzili0217@gmail.com
+Open a [GitHub issue](https://github.com/hanzili/hanzi-browse/issues).

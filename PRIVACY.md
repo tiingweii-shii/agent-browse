@@ -1,72 +1,48 @@
-# Privacy Policy for Hanzi
+# Privacy Policy for Agent Browse
 
-Last updated: March 18, 2026
+Last updated: September 7, 2026
 
 ## Overview
 
-Hanzi is a browser execution platform for AI agents. It operates in multiple modes with different data handling characteristics. This policy explains what data is processed in each mode.
+Agent Browse is a browser execution platform for AI agents. This fork is a
+**private, hardened build that runs BYOM-local only** — the managed / hosted
+service path present in upstream is disabled here (see `hardened/HARDENING.md`).
 
-## BYOM Local Mode
+## BYOM Local Mode (the only mode in this build)
 
-When you use Hanzi locally with your own model provider (BYOM Local):
+- **No data is sent to any hosted Agent Browse service.** All orchestration happens on your machine.
+- Screenshots and page content are sent only to the AI provider you configure (Anthropic, OpenAI, Google, etc.), according to their privacy policies.
+- API keys and credentials are stored locally — in Chrome's storage and/or read from your local machine (e.g. macOS Keychain, Claude/Codex config files) by the local relay to make calls as you.
+- Conversation history and per-task logs are stored locally (task logs under `~/Downloads/browser-agent/`) and are swept on a retention window — see `hardened/HARDENING.md` → *Task-log retention*. You can clear them at any time.
+- Nothing listens on the network; the relay is bound to loopback only.
 
-- **No data is sent to Hanzi servers.** All processing happens on your machine.
-- Screenshots and page content are sent only to your chosen AI provider (Anthropic, OpenAI, Google, etc.) according to their privacy policies.
-- API keys and credentials are stored locally in Chrome's secure storage.
-- Conversation history is stored locally and can be cleared at any time.
+## What Agent Browse Does Not Do
 
-## Managed Mode
-
-When you use Hanzi's managed service (sign in at api.hanzilla.co):
-
-- **Task data is processed on Hanzi servers.** This includes task descriptions, page content, screenshots, and tool execution results.
-- Hanzi routes AI inference through its own model provider (currently Google Vertex AI). Your data is processed according to [Google Cloud's data processing terms](https://cloud.google.com/terms/data-processing-terms).
-- Task records, usage data, and session metadata are stored in Hanzi's database (hosted on Neon Postgres in AWS US East).
-- Browser session tokens are stored as hashed values. API keys are stored as hashed values.
-- You can request deletion of your data by contacting us.
-
-## API / SDK Mode
-
-When a developer integrates Hanzi via the API/SDK:
-
-- The same data handling as Managed Mode applies.
-- Task execution data is attributed to the developer's workspace for usage tracking.
-- The developer is responsible for informing their end users about Hanzi's role in data processing.
-
-## What Hanzi Does Not Do
-
-Across all modes, Hanzi:
-
-- Does NOT sell or share user data with third parties for advertising
+- Does NOT sell or share user data with third parties
 - Does NOT track browsing history outside of active task execution
-- Does NOT retain screenshots or page content beyond the task session (managed mode stores task answers and usage metrics, not raw page content)
+- Does NOT send telemetry or error reports (Sentry / analytics are removed in this build)
 
 ## Third-Party Services
 
-Depending on your mode, data may be processed by:
+Data is processed only by the AI provider you configure, for example:
 
-- **Google Vertex AI** (managed mode): [Google Cloud Privacy](https://cloud.google.com/terms/data-processing-terms)
-- **Anthropic** (BYOM local): [Anthropic Privacy](https://www.anthropic.com/privacy)
-- **OpenAI** (BYOM local): [OpenAI Privacy](https://openai.com/privacy)
-- **Neon** (managed mode database): [Neon Privacy](https://neon.tech/privacy)
+- **Anthropic**: [Anthropic Privacy](https://www.anthropic.com/privacy)
+- **OpenAI**: [OpenAI Privacy](https://openai.com/privacy)
+- **Google**: [Google Cloud Privacy](https://cloud.google.com/terms/data-processing-terms)
 
 ## Extension Permissions
 
-The Chrome extension requires broad permissions (`<all_urls>`) to:
+The Chrome extension requires broad permissions (`<all_urls>`, `debugger`) to:
 
 - Read page content for AI understanding
 - Take screenshots for visual analysis
 - Interact with page elements (click, type, scroll)
 - Manage browser tabs
 
-These permissions are used solely for browser automation at your request.
+These permissions are used solely for browser automation at your request. Because
+the extension has broad browser control and LLM-driven agents can be steered by
+hostile page content, run it in a dedicated, isolated browser profile.
 
 ## Contact
 
-For questions about this privacy policy: hanzili0217@gmail.com
-
-Or open an issue: https://github.com/hanzili/hanzi-browse/issues
-
-## Changes
-
-We may update this policy as the product evolves. Changes will be posted to this page with an updated date.
+Open an issue: https://github.com/hanzili/hanzi-browse/issues

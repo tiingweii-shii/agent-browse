@@ -1,13 +1,13 @@
-## Hanzi Browse — Architecture Guide
+## Agent Browse — Architecture Guide
 
 This file is for AI agents (Claude Code, Cursor, Codex, etc.) working on this codebase. It describes what this project is, how it works, and where things live.
 
-### What is Hanzi Browse?
+### What is Agent Browse?
 
 A browser automation platform that gives AI agents access to a real Chrome browser with the user's signed-in sessions. The AI agent sends a task, the browser executes it autonomously.
 
 Two distribution paths:
-- **Skills** — for users who run Hanzi Browse locally via their AI agent (Claude Code, Cursor, etc.)
+- **Skills** — for users who run Agent Browse locally via their AI agent (Claude Code, Cursor, etc.)
 - **Free tools** — public web apps that demonstrate use cases (e.g. tools.hanzilla.co/x-marketing)
 
 Both paths require the same infrastructure: Chrome extension + site patterns + LLM.
